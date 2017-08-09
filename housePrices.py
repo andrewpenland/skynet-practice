@@ -29,6 +29,32 @@ house_test_df = pd.read_csv('test.csv', index_col = None)
 house_train_df = pd.read_csv('train.csv', index_col = None)
 print(str(house_train_df.head()))
 
+#print(list(house_test_df))
+
+print(list(house_train_df.dtypes.names))
+
+
+def carefulnanchecklist(x):
+    for elt in x:
+        if type(elt) is str:
+            pass
+        else:
+            if np.isnan(elt):
+                return True
+    return False
+
+#if house_train_df.dtypes[0] == np.int64:
+#    print("success")
+#    if carefulnanchecklist(house_train_df.values[:,33]):
+#        print("double success")
+#        test_df = house_train_df.copy()
+#        le = preprocessing.LabelEncoder()
+#        print(str(test_df.values[:,33]))
+#        test_df.values[:,33] = [str(x) for x in test_df.values[:,33]]
+#        test_df.values[:,33] = le.fit_transform(test_df.values[:,33])
+#        print(test_df)
+    
+
 # .mean() will average the data so that only the average in gravel and paved
 # will show and nothing else. 
 class_alley_grouping = house_train_df.groupby(['Alley']).mean()
@@ -40,48 +66,71 @@ def preprocess_house_df(df):
     processed_df = df.copy()
     le = preprocessing.LabelEncoder()
     #replace sex and embarked with integers
-    processed_df.MSZoning = le.fit_transform(processed_df.MSZoning)
-    processed_df.Street = le.fit_transform(processed_df.Street)
-    processed_df.Alley = [str(x) for x in processed_df.Alley]
-    processed_df.Alley = le.fit_transform(processed_df.Alley)
-    processed_df.LotShape= le.fit_transform(processed_df.LotShape)
-    processed_df.LandContour= le.fit_transform(processed_df.LandContour)
-    processed_df.Utilities= le.fit_transform(processed_df.Utilities)
-    processed_df.LotConfig= le.fit_transform(processed_df.LotConfig)
-    processed_df.LandSlope= le.fit_transform(processed_df.LandSlope)
-    processed_df.Neighborhood= le.fit_transform(processed_df.Neighborhood)
-    processed_df.Condition1= le.fit_transform(processed_df.Condition1)
-    processed_df.Condition2= le.fit_transform(processed_df.Condition2)
-    processed_df.BldgType= le.fit_transform(processed_df.BldgType)
-    processed_df.BldgType= le.fit_transform(processed_df.BldgType)
-    processed_df.HouseStyle= le.fit_transform(processed_df.HouseStyle)
-    processed_df.RoofStyle= le.fit_transform(processed_df.RoofStyle)
-    processed_df.RoofMatl= le.fit_transform(processed_df.RoofMatl)
-    processed_df.Exterior1st= le.fit_transform(processed_df.Exterior1st)
-    processed_df.Exterior2nd= le.fit_transform(processed_df.Exterior2nd)
-    processed_df.MasVnrType = [str(x) for x in processed_df.MasVnrType]
-    processed_df.MasVnrType = le.fit_transform(processed_df.MasVnrType)
-    processed_df.ExterQual= le.fit_transform(processed_df.ExterQual)
-    processed_df.ExterCond= le.fit_transform(processed_df.ExterCond)
-    processed_df.Foundation= le.fit_transform(processed_df.Foundation)
-    processed_df.BsmtQual = [str(x) for x in processed_df.BsmtQual]
-    processed_df.BsmtQual = le.fit_transform(processed_df.BsmtQual)
-    processed_df.BsmtCond = [str(x) for x in processed_df.BsmtCond]
-    processed_df.BsmtCond = le.fit_transform(processed_df.BsmtCond)
-    processed_df.BsmtExposure = [str(x) for x in processed_df.BsmtExposure]
-    processed_df.BsmtExposure = le.fit_transform(processed_df.BsmtExposure)
-    processed_df.BsmtFinType1 = [str(x) for x in processed_df.BsmtFinType1]
-    processed_df.BsmtFinType1 = le.fit_transform(processed_df.BsmtFinType1)
-    processed_df.BsmtFinType2 = [str(x) for x in processed_df.BsmtFinType2]
-    processed_df.BsmtFinType2 = le.fit_transform(processed_df.BsmtFinType2)
-    processed_df.PoolQC = [str(x) for x in processed_df.PoolQC]
-    processed_df.PoolQC = le.fit_transform(processed_df.PoolQC)
-    processed_df.Fence = [str(x) for x in processed_df.Fence]
-    processed_df.Fence = le.fit_transform(processed_df.Fence)
-    processed_df.MiscFeature = [str(x) for x in processed_df.MiscFeature]
-    processed_df.MiscFeature = le.fit_transform(processed_df.MiscFeature)
-    processed_df.SaleType= le.fit_transform(processed_df.SaleType)
-    processed_df.SaleCondition= le.fit_transform(processed_df.SaleCondition)
+    i=0
+    for name in processed_df.dtypes:
+        actual_name = list(processed_df)
+        if type(name) is np.float64:
+            pass
+        if type(name) is np.int64:
+            pass
+        if type(name) is np.object:
+            if carefulnanchecklist(processed_df.values[:,i]):
+#                pass
+                processed_df = processed_df.drop(name, 1)
+                i=i-1
+#                processed_df.values[:,i] = [str(x) for x in processed_df.values[:,i]]
+#                processed_df.values[:,i] = le.fit_transform(processed_df.values[:,i])
+            else: 
+                if name == BsmtFinType2 or name == BsmtFinType1:
+                    processed_df = processed_df.drop(name, 1)
+                else:
+                    processed_df.values[:,i] = le.fit_transform(processed_df.values[:,i]) 
+                    i=i-1
+#       
+        i += 1
+        
+#    processed_df.MSZoning = le.fit_transform(processed_df.MSZoning)
+#    processed_df.Street = le.fit_transform(processed_df.Street)
+#    processed_df.Alley = [str(x) for x in processed_df.Alley]
+#    processed_df.Alley = le.fit_transform(processed_df.Alley)
+#    processed_df.LotShape= le.fit_transform(processed_df.LotShape)
+#    processed_df.LandContour= le.fit_transform(processed_df.LandContour)
+#    processed_df.Utilities= le.fit_transform(processed_df.Utilities)
+#    processed_df.LotConfig= le.fit_transform(processed_df.LotConfig)
+#    processed_df.LandSlope= le.fit_transform(processed_df.LandSlope)
+#    processed_df.Neighborhood= le.fit_transform(processed_df.Neighborhood)
+#    processed_df.Condition1= le.fit_transform(processed_df.Condition1)
+#    processed_df.Condition2= le.fit_transform(processed_df.Condition2)
+#    processed_df.BldgType= le.fit_transform(processed_df.BldgType)
+#    processed_df.BldgType= le.fit_transform(processed_df.BldgType)
+#    processed_df.HouseStyle= le.fit_transform(processed_df.HouseStyle)
+#    processed_df.RoofStyle= le.fit_transform(processed_df.RoofStyle)
+#    processed_df.RoofMatl= le.fit_transform(processed_df.RoofMatl)
+#    processed_df.Exterior1st= le.fit_transform(processed_df.Exterior1st)
+#    processed_df.Exterior2nd= le.fit_transform(processed_df.Exterior2nd)
+#    processed_df.MasVnrType = [str(x) for x in processed_df.MasVnrType]
+#    processed_df.MasVnrType = le.fit_transform(processed_df.MasVnrType)
+#    processed_df.ExterQual= le.fit_transform(processed_df.ExterQual)
+#    processed_df.ExterCond= le.fit_transform(processed_df.ExterCond)
+#    processed_df.Foundation= le.fit_transform(processed_df.Foundation)
+#    processed_df.BsmtQual = [str(x) for x in processed_df.BsmtQual]
+#    processed_df.BsmtQual = le.fit_transform(processed_df.BsmtQual)
+#    processed_df.BsmtCond = [str(x) for x in processed_df.BsmtCond]
+#    processed_df.BsmtCond = le.fit_transform(processed_df.BsmtCond)
+#    processed_df.BsmtExposure = [str(x) for x in processed_df.BsmtExposure]
+#    processed_df.BsmtExposure = le.fit_transform(processed_df.BsmtExposure)
+#    processed_df.BsmtFinType1 = [str(x) for x in processed_df.BsmtFinType1]
+#    processed_df.BsmtFinType1 = le.fit_transform(processed_df.BsmtFinType1)
+#    processed_df.BsmtFinType2 = [str(x) for x in processed_df.BsmtFinType2]
+#    processed_df.BsmtFinType2 = le.fit_transform(processed_df.BsmtFinType2)
+#    processed_df.PoolQC = [str(x) for x in processed_df.PoolQC]
+#    processed_df.PoolQC = le.fit_transform(processed_df.PoolQC)
+#    processed_df.Fence = [str(x) for x in processed_df.Fence]
+#    processed_df.Fence = le.fit_transform(processed_df.Fence)
+#    processed_df.MiscFeature = [str(x) for x in processed_df.MiscFeature]
+#    processed_df.MiscFeature = le.fit_transform(processed_df.MiscFeature)
+#    processed_df.SaleType= le.fit_transform(processed_df.SaleType)
+#    processed_df.SaleCondition= le.fit_transform(processed_df.SaleCondition)
     #processed_df = processed_df.drop(['name'], axis=1)
     #drop these categories
 #    processed_df = processed_df.drop(['home.dest'],axis=1)
